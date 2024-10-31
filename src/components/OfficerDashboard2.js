@@ -1,200 +1,230 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import Modal from 'react-modal';
+import './officerdashboard.css';
 
-const OfficerDashboard2 = () => {
-  // Inline styles
-  const styles = {
-    container: {
-      display: 'flex',
-      flexDirection: 'column',
-      height: '120vh',  // Increased height to make the container longer
-      fontFamily: 'Arial, sans-serif',
-    },
-    header: {
-      backgroundColor: 'white',
-      padding: '20px 0',  // Vertical padding only
-      borderBottom: '1px solid #9C0B0F',
-      textAlign: 'center',
-      position: 'relative',  // Position relative for absolute positioning of the search bar
-    },
-    logo: {
-      height: '50px',  // Adjust the height to make the logo smaller
-      width: '50px',
-      position: 'absolute',
-      left: '60px',
-      top: '10px',
-    },
-    sidebar: {
-      width: '150px',
-      backgroundColor: '#9C0B0F',
-      color: 'white',
-      padding: '20px',
-      height: '100%',
-      display: 'flex',
-      flexDirection: 'column',
-    },
-    mainContent: {
-      flex: 1,
-      padding: '20px',
-    },
-    tableContainer: {
-      border: '1px solid #ccc',  // Border for the rectangle
-      borderRadius: '5px',       // Rounded corners
-      padding: '20px',           // Padding inside the rectangle
-      backgroundColor: '#D9D9D9',  // Light gray background for the container
-      boxShadow: '0 2px 10px rgba(0, 0, 0, 0.1)',  // Shadow for depth
-      marginTop: '20px',         // Space above the rectangle
-      height: '120vh',
-    },
-    table: {
-      width: '100%',
-      borderCollapse: 'collapse',
-      borderRadius: '15px',  // Added border radius
-      overflow: 'hidden',    // Ensure border radius is applied to the table
-      backgroundColor: '#ffffff', // White background for the table
-    },
-    th: {
-      backgroundColor: 'white',
-      color: 'black',
-      padding: '10px',
-      textAlign: 'Center',
-    },
-    td: {
-      padding: '10px',
-      textAlign: 'center',
-    },
-    title: {
-      fontSize: '30px',
-      marginBottom: '10px',
-      fontWeight: 'bold',
-    },
-    userName: {
-      fontSize: '20px',
-      fontWeight: 'xtra bold',
-      color: '#ffffff',  // White color for better visibility
-      margin: '0',      // Remove default margin
-      borderBottom: '1px solid #ffffff',  // Line below the name
-      paddingBottom: '10px', // Space between the name and the links
-    },
-    userRole: {
-      fontSize: '14px',
-      color: '#ffffff',  // White color for better visibility
-      margin: '0',      // Remove default margin
-      paddingBottom: '30px', // Space below the user role
-    },
-    link: {
-      color: '#030229',
-      textDecoration: 'none',
-      textAlign: 'left',
-      padding: '10px',
-      borderRadius: '15px',  // Rounded corners
-      marginBottom: '10px',  // Space between links
-      transition: 'border 0.3s',  // Smooth border transition
-      backgroundColor: 'white',
-      fontSize: '16',
-    },
-    logoutButton: {
-      color: 'white',
-      fontSize: '20px',
-      padding: '10px',
-      textAlign: 'center',
-      textDecoration: 'none',
-      border: 'none',
-      cursor: 'pointer',
-      fontWeight: 'bold',
-      marginTop: '20px', // Space above the logout button
-    },
-    searchContainer: {
-      position: 'absolute',
-      right: '20px',
-      top: '15px',  // Adjust this value to fit within the header
-    },
-    searchInput: {
-      padding: '8px',
-      fontSize: '14px',
-      borderRadius: '23px',
-      width: '300px',
-      backgroundColor: '#F5F3FF',
-    },
+const Dashboard2 = () => {
+  const [loggedIn, setLoggedIn] = useState(true);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [transactions, setTransactions] = useState([]);
+  const [modalIsOpen, setModalIsOpen] = useState(false);
+  const [editData, setEditData] = useState({
+    loanId: '',
+    applicantName: '',
+    loanAmount: '',
+    loanType: '',
+    loanTerm: '',
+    defaultStatus: '',
+  });
+  const navigate = useNavigate();
+
+  // Handle logout
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('userId');
+    localStorage.removeItem('role');
+    setLoggedIn(false);
+    navigate('/login');
+  };
+
+  // Fetch pending loans on component load
+  useEffect(() => {
+    const fetchPendingLoans = async () => {
+      try {
+        const response = await fetch('http://localhost:3001/loans/pending');
+        if (!response.ok) throw new Error('Failed to fetch pending loans');
+        const data = await response.json();
+        setTransactions(data);
+      } catch (error) {
+        console.error('Error fetching pending loans:', error);
+      }
+    };
+
+    fetchPendingLoans();
+  }, []);
+
+  // Filter transactions based on search term
+  const filteredTransactions = transactions.filter(transaction =>
+    transaction.applicantName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    transaction.loanAmount.toString().includes(searchTerm.toLowerCase()) ||
+    transaction.loanType.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    transaction.loanTerm.toString().includes(searchTerm.toLowerCase()) ||
+    transaction.applicationDate.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    transaction.defaultStatus.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  // Handle Edit Functionality
+  const handleEdit = (transaction) => {
+    setEditData(transaction);
+    setModalIsOpen(true);
+  };
+
+  const handleSave = async () => {
+    try {
+      const response = await fetch(`http://localhost:3001/loan/${editData.loanId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(editData),
+      });
+      if (!response.ok) throw new Error('Error updating transaction');
+      const updatedTransactions = transactions.map(t =>
+        t.loanId === editData.loanId ? editData : t
+      );
+      setTransactions(updatedTransactions);
+      setModalIsOpen(false);
+    } catch (error) {
+      console.error('Error updating transaction:', error);
+    }
+  };
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setEditData(prevState => ({ ...prevState, [name]: value }));
+  };
+
+  // Handle Delete Functionality
+  const handleDelete = async (loanId) => {
+    if (window.confirm('Are you sure you want to delete this loan?')) {
+      try {
+        await fetch(`http://localhost:3001/loan/${loanId}`, { method: 'DELETE' });
+        setTransactions(transactions.filter(t => t.loanId !== loanId));
+      } catch (error) {
+        console.error('Error deleting transaction:', error);
+      }
+    }
   };
 
   return (
-    <div style={styles.container}>
-      <div style={styles.header}>
-        <img src="/logo.png" alt="Logo" style={styles.logo} />
-        <h1 style={{ fontFamily: 'Acme', fontSize: '15px', color: '#9C0B0F', marginRight: '750px', marginTop: '1px' }}>
-          MSU-IIT National Multi-Purpose Cooperative
-        </h1>
-        <div style={styles.searchContainer}>
-          <input
-            type="text"
-            placeholder="Search..."
-            style={styles.searchInput}
-          />
+    <div className="offdashboard">
+      <header className="header">
+        <img src="logo.png" alt="MSU-IIT NMPC Logo" className="logol" />
+        <h2 className="landingh2off2">MSU-IIT National Multi-Purpose Cooperative</h2>
+      </header>
+
+      <div className="sidebar">
+        <div className="profile">
+          <img src="prof.png" alt="Profile" className="profile-pic" />
+          <div className="profile-info">
+            <h3 className="username">Nicholas Patrick</h3>
+            <div className="username-divider"></div>
+            <p className="role">Loan Clerk</p>
+          </div>
         </div>
-      </div>
-      <div style={{ display: 'flex', flex: 1 }}>
-        <div style={styles.sidebar}>
-          <p style={styles.userName}>Nicholas Patrick</p>
-          <p style={styles.userRole}>Loan Clerk</p>
-          <a href="/officerdash" style={styles.link}>Dashboard</a>
-          <a href="/OfficerDashboard2" style={{...styles.link, backgroundColor: '#10004E', color: 'white'}}>Loan Applications</a>
-          <a href="/OfficerDashboard3" style={styles.link}>Borrower List</a>
-          <a href="/payment" style={styles.link}>Payment</a>
-          <a href="/profile" style={styles.link}>Profile</a>
-          <a href="/logout" style={styles.logoutButton}>Logout</a>
-        </div>
-        <div style={styles.mainContent}>
-          <div style={styles.title}>Pending Loan Application</div>
-          <div style={styles.tableContainer}>  {/* Rectangle around the table */}
-            <table style={styles.table}>
-              <thead>
-                <tr>
-                  <th style={styles.th}>Applicant Name</th>
-                  <th style={styles.th}>Loan Amount</th>
-                  <th style={styles.th}>Loan Type</th>
-                  <th style={styles.th}>Tenure</th>
-                  <th style={styles.th}>Date Applied</th>
-                  <th style={styles.th}>Step/process</th>
-                  <th style={styles.th}>Status</th>
-                </tr>
-              </thead>
-              <tbody>
-                {/* Placeholder for table data */}
-                <tr>
-                  <td style={styles.td}>John Doe</td>
-                  <td style={styles.td}>5000</td>
-                  <td style={styles.td}>Personal</td>
-                  <td style={styles.td}>12 months</td>
-                  <td style={styles.td}>2024-10-06</td>
-                  <td style={styles.td}>Review</td>
-                  <td style={styles.td}>Pending</td>
-                </tr>
-                <tr>
-                  <td style={styles.td}>Jane Smith</td>
-                  <td style={styles.td}>7000</td>
-                  <td style={styles.td}>personal</td>
-                  <td style={styles.td}>24 months</td>
-                  <td style={styles.td}>2024-10-07</td>
-                  <td style={styles.td}>Approved</td>
-                  <td style={styles.td}>Completed</td>
-                </tr>
-                <tr>
-                  <td style={styles.td}>Jean Ampang</td>
-                  <td style={styles.td}>1000</td>
-                  <td style={styles.td}>Education</td>
-                  <td style={styles.td}>24 months</td>
-                  <td style={styles.td}>2024-10-01</td>
-                  <td style={styles.td}>Approved</td>
-                  <td style={styles.td}>Completed</td>
-                </tr>
-                {/* Add more rows as needed */}
-              </tbody>
-            </table>
+        <nav className="nav-menu">
+          <Link to="/officerdashboard1">Dashboard</Link>
+          <Link to="/OfficerDashboard2">Loan Applications</Link>
+          <Link to="/OfficerDashboard3">Borrower List</Link>
+          <Link to="/payment">Payment</Link>
+          <Link to="/Officerprof">Profile</Link>
+        </nav>
+
+        <div className="Logoff" onClick={handleLogout}>
+          <img src="Sign_out_squre.png" alt="Logout" className="outpicoff" />
+          <div className="logoutcontoff">
+            <Link to="/login" className="logoutoff">Logout</Link>
           </div>
         </div>
       </div>
+
+      <div className="containeroff">
+        <div className="pending-table">
+          <div className="pending-header">
+            <span>Pending Loan Applications</span>
+            <div className="search-bar">
+              <input
+                type="text"
+                placeholder="Search transactions..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="search-input"
+              />
+            </div>
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th>Applicant Name</th>
+                <th>Loan Amount</th>
+                <th>Loan Type</th>
+                <th>Tenure</th>
+                <th>Date Applied</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredTransactions.map((transaction) => (
+                <tr key={transaction.loanId}>
+                  <td>{transaction.applicantName}</td>
+                  <td>{transaction.loanAmount}</td>
+                  <td>{transaction.loanType}</td>
+                  <td>{transaction.loanTerm}</td>
+                  <td>{transaction.applicationDate}</td>
+                  <td>{transaction.defaultStatus}</td>
+                  <td>
+                    <button
+                      className="btn btn-edit"
+                      onClick={() => handleEdit(transaction)}
+                    >
+                      Edit
+                    </button>
+                    <button
+                      className="btn btn-delete"
+                      onClick={() => handleDelete(transaction.loanId)}
+                    >
+                      Delete
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* Modal for Editing */}
+      <Modal isOpen={modalIsOpen} onRequestClose={() => setModalIsOpen(false)}>
+        <h2>Edit Loan</h2>
+        <label>Applicant Name</label>
+        <input 
+          type="text" 
+          name="applicantName" 
+          value={editData.applicantName} 
+          onChange={handleChange}
+        />
+        <label>Loan Amount</label>
+        <input 
+          type="number" 
+          name="loanAmount" 
+          value={editData.loanAmount} 
+          onChange={handleChange}
+        />
+        <label>Loan Type</label>
+        <input 
+          type="text" 
+          name="loanType" 
+          value={editData.loanType} 
+          onChange={handleChange}
+        />
+        <label>Loan Term</label>
+        <input 
+          type="number" 
+          name="loanTerm" 
+          value={editData.loanTerm} 
+          onChange={handleChange}
+        />
+        <label>Status</label>
+        <input 
+          type="text" 
+          name="defaultStatus" 
+          value={editData.defaultStatus} 
+          onChange={handleChange}
+        />
+        <button onClick={handleSave}>Save</button>
+        <button onClick={() => setModalIsOpen(false)}>Close</button>
+      </Modal>
     </div>
   );
 };
 
-export default OfficerDashboard2;
+export default Dashboard2;

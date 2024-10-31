@@ -61,7 +61,7 @@ const OfficerProf = () => {
         localStorage.removeItem('userId');
         localStorage.removeItem('role');
         setLoggedIn(false); // Update loggedIn state to false
-        navigate('/'); // Redirect to home page after logout
+        navigate('/login'); // Redirect to home page after logout
     };
 
     return (
@@ -81,17 +81,17 @@ const OfficerProf = () => {
                     </div>
                 </div>
                 <nav className="nav-menu">
-                    <Link to="/officerdashboard">Dashboard</Link>
+                    <Link to="/officerdashboard1">Dashboard</Link>
                     <Link to="/OfficerDashboard2">Loan Applications</Link>
                     <Link to="/OfficerDashboard3">Borrower List</Link>
                     <Link to="/payment">Payment</Link>
-                    <Link to="/officerprof">Profile</Link>
+                    <Link to="/Officerprof">Profile</Link>
                 </nav>
 
                 <div className="Log" onClick={handleLogout}>
                     <img src="Sign_out_squre.png" alt="Logout" className="outpic" />
                     <div className="logoutcont">
-                        <Link to="/logout" className="logout">Logout</Link>
+                        <Link to="/login" className="logout">Logout</Link>
                     </div>
                 </div>
             </div>
@@ -156,23 +156,36 @@ const OfficerProf = () => {
                     </div>
                 </div>
 
-                <section className="card-sectiono">
+            <section className="card-sectiono">
                 <div className="card-containero">
-                    <div className="cardo">
+                    <div className="approvalscard">
                         <h3>Loan Approvals</h3>
                         <p>Check the status of loan approvals for this month.</p>
                     </div>
-                    <div className="cardo">
+                    <div className="activecard">
                         <h3>Active Borrowers</h3>
                         <p>Track and manage all active borrowers.</p>
                     </div>
-                    <div className="cardo">
+                    <div className="overduecard">
                         <h3>Overdue Payments</h3>
                         <p>View overdue payments and take necessary actions.</p>
                     </div>
                 </div>
             </section>
             </main2>
+            <div>          
+                <section className="graph-sectiono">
+                <h3>Graph</h3>
+                    <div className="graph-containero">
+                    
+                        <div className="graph">
+                            <h3>Graphs</h3>
+                            <p>Check the status of loan approvals for this month.</p>
+                        </div>
+                    </div>
+                </section>
+            </div>
+            
             
         </div>
     );

@@ -26,7 +26,7 @@ const Landing = () => {
         // Ensure the token is still available and then navigate to the officer profile page
         const token = localStorage.getItem('token');
         if (token) {
-            navigate('/officerprof'); // Redirect to officer profile
+            navigate('/borrowerdash'); // Redirect to officer profile
         } else {
             // Optional: Handle the case when no token is found (e.g., navigate to login)
             navigate('/login');
@@ -61,7 +61,7 @@ const Landing = () => {
     return (
         <div className="landing-page">
              <header>        
-                {loggedIn ? (
+             {loggedIn ? (
                     <>
                     <img src="logo.png" alt="MSU-IIT NMPC Logo" className="logol"/>
                     <h2 className="landingh2ql">MSU-IIT National Multi-Purpose Cooperative</h2>
@@ -90,14 +90,14 @@ const Landing = () => {
             
             <div className="contentlan">
                <div className="main-banner">
-                <div className="text-content">
-                    <h1>Quick and Easy Loans for Your Financial Needs.</h1>
-                    <p>Our loan services offer a hassle-free and streamlined borrowing experience, providing you with the funds you need in a timely manner to meet your financial requirements.</p>
-                    <button className="apply-btn">Apply Now!</button>
-                    
+                    <div className="text-content">
+                        <h1>Quick and Easy Loans for Your Financial Needs.</h1>
+                        <p>Our loan services offer a hassle-free and streamlined borrowing experience, providing you with the funds you need in a timely manner to meet your financial requirements.</p>
+                        <Link to="/appform" style={{ textDecoration: 'none', color: 'inherit' }}>Apply Now!</Link>
+                        
+                    </div>
+                    <img src="bldg.png" alt="Building" className="banner-img"/>
                 </div>
-                <img src="bldg.png" alt="Building" className="banner-img"/>
-            </div>
                 <div className="services-section">
                         <h2 className="services">About Us</h2>
                             <p className="aboutp">The MSU-IIT National Multi-Purpose Cooperative is a financial institution based in Iligan City, Lanao del Norte, Philippines.

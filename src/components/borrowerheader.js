@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom'; // Add this line
 const BorrowerHeader = () => {
   return (
     <header className="headdash">
-        <img src="logo.png" alt="MSU-IIT NMPC Logo" className="logo"/>
+        <img src="logo.png" alt="MSU-IIT NMPC Logo" className="logol"/>
         <h2 className="dashh2">MSU-IIT National Multi-Purpose Cooperative</h2>
         <nav className="iconn">
             <Link to="/login">

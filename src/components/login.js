@@ -34,8 +34,11 @@ const Login = () => {
             console.log(`Response received:`, response.data); 
             console.log(`Role received: '${role}'`);
     
-            // Redirect to the landing page after login, regardless of role
-            navigate('/'); // Redirect to the landing page ("/")
+            if (role === 'admin') {
+                navigate('/officerdashboard1'); // Navigate to admin dashboard
+            } else if (role === 'member') {
+                navigate('/'); // Navigate to member landing page
+            }
     
         } catch (error) {
             console.error('Error during login:', error);
@@ -48,6 +51,7 @@ const Login = () => {
         navigate('/'); 
     };
     
+    
     const handleRegister = () => {
         navigate('/signup'); 
     };
@@ -59,12 +63,13 @@ const Login = () => {
                {/* <button className="reg-btn" onClick={handleRegister}>Register</button>*/} 
                 <img src="logo.png" alt="MSU-IIT NMPC Logo" className="logolog"/>
                 <h2 className="loginh2">MSU-IIT National Multi-Purpose Cooperative</h2>
-                <p>Your Gateway to Financial Possibilities.</p>
+                <p className="loginp">Your Gateway to Financial Possibilities.</p>
                 <form onSubmit={handleSubmit}>
                     <label className="labels">Username</label>
                     <input 
                         type="text" 
                         id="usernameoremail"
+                        className="login"
                         placeholder="Username or Email..." 
                         onChange={(e) => setUsernameOrEmail(e.target.value)}
                     />
@@ -72,13 +77,14 @@ const Login = () => {
                     <input 
                         type="password" 
                         id="password"
+                        className="login"
                         placeholder="**************" 
                         onChange={(e) => setPassword(e.target.value)}
                     />
                     <div className="options">
                         <div className="remember-me">
                             <input type="checkbox" id="remember" />
-                            <label htmlFor="remember">Remember me</label>
+                            <label htmlFor="remember" >Remember me</label>
                         </div>
                         <a href="#" className="forgot">Forgot Password?</a>
                     </div>

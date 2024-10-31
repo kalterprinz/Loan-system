@@ -1,10 +1,9 @@
 .footer {
     background-color: #2b2b2b;
-    padding: 20px;
     padding-top: 25px;
     color: white;
     text-align: center;
-    width: 97%;
+    width: 100%;
     
 }
 
@@ -23,10 +22,10 @@
     margin-left: 130px;
     margin-top: -25px;
 }
-.logo1{
+.logofooter{
     width: 100px;
-    margin-left: 50px;
     margin-top: -20px;
+    border-radius: 75px;
 }
 .footer-links {
     display: flex;
@@ -64,8 +63,8 @@
 .footer-bottom {
     padding: 10px;
     text-align: center;
-    width: 100%;
     margin-bottom: -20px;
+    background-color: #1f1f1f;
 
 }
 

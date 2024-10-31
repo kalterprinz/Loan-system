@@ -106,13 +106,13 @@ app.post('/loan', async (req, res) => {
 
 app.put('/loan/:loanId', async (req, res) => {
     const loanId = req.params.loanId;
-    const updateData = req.body; // Partial update
+    const updateData = req.body;
 
     try {
         const loan = await LoanModel.findOneAndUpdate(
-            { loanId: loanId }, // Filter by loanId
-            updateData,         // Data to update
-            { new: true }       // Return the updated document
+            { loanId: loanId },
+            updateData,
+            { new: true }
         );
 
         if (!loan) {
@@ -125,6 +125,7 @@ app.put('/loan/:loanId', async (req, res) => {
         res.status(500).json({ error: 'Failed to update loan' });
     }
 });
+
 
 app.delete('/loan/:loanId', async (req, res) => {
     const loanId = req.params.loanId;
@@ -142,6 +143,52 @@ app.delete('/loan/:loanId', async (req, res) => {
         res.status(500).json({ error: 'Failed to delete loan' });
     }
 });
+
+app.get('/loans', async (req, res) => {
+    try {
+        const { defaultStatus } = req.query;
+
+        // If a defaultStatus is specified, use it as a filter; otherwise, return all loans
+        const filter = defaultStatus ? { defaultStatus } : {};
+        const loans = await LoanModel.find(filter);
+
+        res.status(200).json(loans);
+    } catch (err) {
+        console.error('Error fetching loans:', err);
+        res.status(500).json({ message: 'Failed to retrieve loans' });
+    }
+});
+
+app.get('/loans/pending', async (req, res) => {
+    try {
+        const pendingLoans = await LoanModel.find({ defaultStatus: 'Pending' });
+        res.status(200).json(pendingLoans);
+    } catch (err) {
+        console.error('Error fetching pending loans:', err);
+        res.status(500).json({ message: 'Failed to retrieve pending loans' });
+    }
+});
+
+app.get('/borrowers/approved', async (req, res) => {
+    try {
+        const approvedBorrowers = await LoanModel.find({ defaultStatus: 'Approved' });
+        res.status(200).json(approvedBorrowers);
+    } catch (err) {
+        console.error('Error fetching approved borrowers:', err);
+        res.status(500).json({ message: 'Failed to retrieve approved borrowers' });
+    }
+});
+
+app.get('/payments/approved', async (req, res) => {
+    try {
+        const approvedPayments = await LoanModel.find({ defaultStatus: 'Approved' });
+        res.status(200).json(approvedPayments);
+    } catch (err) {
+        console.error('Error fetching approved payments:', err);
+        res.status(500).json({ message: 'Failed to retrieve approved payments' });
+    }
+});
+
 
 app.listen(port, '0.0.0.0', () => {
     console.log(`Server running on port ${port}`);

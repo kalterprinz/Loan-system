@@ -5,12 +5,6 @@ import './Stats.css';
 const Stats = () => {
   return (
     <div className="stats-container">
-      {/* Loan Management System Title and Generate Report Button */}
-      <div className="header-section">
-        <h1 className="loan-title">Loan Management System</h1>
-        <button className="generate-report-button">Generate Report</button>
-      </div>
-
       {/* Stats Boxes */}
       <div className="stats">
         <div className="stat-box active-loans">

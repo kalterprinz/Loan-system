@@ -1,0 +1,366 @@
+.application-form-page {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: white;
+    width: 100%;
+   
+}
+
+header {
+    display: flex;
+    justify-content: space-between;
+    padding-bottom: 5px;
+    background-color: white;
+    box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.1);
+    position: fixed;
+    width: 100%;
+    top: 0;
+    z-index: 1000;
+    border-bottom: 1px solid #990000;
+}
+
+.form-container {
+    width: 990px;
+    margin-top: 8%; /* Leave space for the fixed header */
+    background-color: #E6E6EA;
+    padding: 20px 50px; /* Add padding on all sides (top/bottom: 30px, left/right: 20px) */
+    border-radius: 8px;
+    border: 1px dashed #000000; /* Dashed border */
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+}
+
+
+.form-title {
+    font-size: 36px;
+    font-weight: bold;
+    text-align: left; /* Align text to the left */
+    margin-bottom: 20px;
+    margin-left: 1px; /* Add some space from the left edge */
+}
+
+
+.loan-form {
+    display: flex;
+    flex-direction: column;
+    padding: 10px;
+}
+
+.form-row1 {
+    display: flex;
+    justify-content: flex-end; /* Aligns the content to the right */
+    gap: 10px; /* Adjusts spacing between items, you can set it as needed */
+    margin-top: -65px; /* Remove negative margins */
+    margin-right: 0; /* Remove negative margins */
+    
+}
+
+.form-group-1,
+.form-group-2 {
+    display: flex;
+    align-items: center; /* Aligns items vertically in the center */
+    margin-bottom: 10px; /* Adds spacing between form groups */
+}
+
+.form-group-1 label
+{
+    margin-right: 5px;
+    font-size: 18px;
+    color: #000000;
+    font-weight: bold;
+   
+}
+.form-group-2 label {
+    width: 100px; /* Set a fixed width for labels to align them */
+    font-size: 18px;
+    color: #000000;
+    font-weight: bold;
+    margin-right: 2px; /* Adds space between label and input */
+}
+
+.form-group-1 select,
+.form-group-2 input[type="date"] {
+    width: 150px; /* Ensures consistency in width for both input types */
+    padding: 8px;
+    border: 1px solid #000000;
+    border-radius: 4px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+
+.form-group-3 {
+    display: flex;
+    align-items: center; /* Vertically center */
+    justify-content: flex-end; /* Align items to the right */
+    margin-bottom: 10px; /* Space between form groups */
+    width: 100%; /* Ensure the container takes full width */
+    padding-right: 20px; /* Optional: add padding to control distance from the right edge */
+}
+
+
+.form-group-3 label {
+    margin-right: 20px; /* Adds space between checkboxes */
+    font-size: 18px;
+    color: #000000;
+    font-weight: bold;
+}
+/* The container */
+.container {
+    display: block;
+    position: relative;
+    padding-left: 50px;
+    margin-top: 25px;
+    cursor: pointer;
+    font-size: 22px;
+}
+
+
+/* Hide the browser's default checkbox */
+.container input {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+    height: 0;
+    width: 0;
+}
+
+/* Create a custom checkbox */
+.checkmark {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 25px;
+    width: 25px;
+    background-color: #eee;
+    border: 1px solid #10004E;
+}
+.checkmark-1 {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 25px;
+    width: 25px;
+    background-color: #eee;
+    border: 1px solid #10004E;
+}
+
+/* On mouse-over, add a grey background color */
+.container:hover input ~ .checkmark {
+    background-color: #ccc;
+}
+
+/* When the checkbox is checked, add a blue background */
+.container input:checked ~ .checkmark {
+    background-color: #10004E;
+}
+
+/* Create the checkmark/indicator (hidden when not checked) */
+.checkmark:after {
+    content: "";
+    position: absolute;
+    display: none;
+}
+
+/* Show the checkmark when checked */
+.container input:checked ~ .checkmark:after {
+    display: block;
+}
+
+/* Style the checkmark/indicator */
+.container .checkmark:after {
+    left: 9px;
+    top: 5px;
+    width: 5px;
+    height: 10px;
+    border: solid white;
+    border-width: 0 3px 3px 0;
+    -webkit-transform: rotate(45deg);
+    -ms-transform: rotate(45deg);
+    transform: rotate(45deg);
+}
+
+.form-row2 {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 10px;
+    padding: 10px;
+    gap: 50px;
+}
+
+
+.gender {
+    display: flex; /* Use flexbox for alignment */
+    flex-direction: column; /* Stack label and input vertically */
+    width: 50%; /* Make each group take full width */
+}
+.age {
+    display: flex; /* Use flexbox for alignment */
+    align-items: flex-end;
+    flex-direction: column; /* Stack label and input vertically */
+    width: 41.5%; /* Make each group take full width */
+    margin-left: 100px;
+    margin-top: -74px;
+}
+
+.age input {
+    width: 50px; /* Set width to 50px */
+    padding: 5px; /* Add padding for better appearance */
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 14px;
+    margin-left: 150px;
+}
+.age label {
+    margin-right: -10px;
+}
+.civil{
+    display: flex; /* Use flexbox for alignment */
+    flex-direction: column; /* Stack label and input vertically */
+    width: 50%; /* Make each group take full width */
+}
+
+.column {
+    min-width: 50px;
+    flex:1;
+
+}
+
+
+
+.form-group {
+    margin-bottom: 10px;
+    width: 95%;
+    background-color: #E6E6EA;
+    
+    
+ }
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 14px;
+    color: #000000;
+    margin-left: 5px;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea,
+.form-group input[type="file"] {
+    width: 100%; /* Ensures all input types take the full width of the parent */
+    padding: 10px;
+    border-radius: 0;
+    font-size: 14px;
+    border: 1px solid #10004E;
+}
+
+textarea {
+    height: 60px; /* Keep this if you want a fixed height for textareas */
+}
+
+.checkbox-group {
+    padding-left: 5px;
+}
+
+.submit-btn {
+    background-color: #10004E;
+    color: white;
+    padding: 10px;
+    border: none; /* This will have no effect on an anchor tag, you may remove it */
+    border-radius: 25px;
+    cursor: pointer;
+    margin-top: 20px;
+    width: 15%; /* Adjust this if you want the button to be wider */
+    text-align: center; /* Center text inside the anchor */
+    display: inline-block; /* Ensure the anchor behaves like a button */
+    text-decoration: none; /* Remove underline from the anchor text */
+}
+
+.submit-btn:hover {
+    background-color: #2f2a8c;
+}
+
+
+.aboutp {
+    flex-grow: 1;
+    font-size: 14px;
+    line-height: 150%;
+    text-align: justify;
+    margin: 0 auto;
+    max-width: 95%;
+}
+
+.checkbox-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px; /* Optional: Adds some spacing between items */
+}
+
+.checkbox-item label {
+    margin-right: 10px; /* Adds space between the label and checkbox */
+}
+
+.payment-others-text {
+    width: 50%;
+    border: none; /* Adjust if needed */
+}
+
+
+
+.form-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    margin-left: 80px; /* Adjust as per your needs */
+}
+
+.form-controls {
+    display: flex;
+    gap: 20px; /* Adds space between the Branch and Date fields */
+}
+
+.form-controls .form-group {
+    display: flex;
+    flex-direction: column;
+    margin-left: 20px;
+    width: 100%; /* Ensures each form group is full width */
+}
+
+.other {
+    margin-bottom: 10px;
+    width: 93%;
+    margin: 5px; /* Margin around the form container */
+    padding: 20px; /* Padding inside the container */
+    border-radius: 8px; /* Rounded corners */
+
+}
+
+.form-row {
+    display: flex;
+    flex-wrap: wrap; /* Allows the columns to wrap onto the next line if needed */
+    gap: 20px; /* Adds space between columns */
+}
+
+.column {
+    flex: 1; /* Each column will take equal space */
+    min-width: 200px; /* Minimum width for responsiveness */
+}
+.column-1 {
+    flex: 1; /* Each column will take equal space */
+    min-width: 200px; /* Minimum width for responsiveness */
+}
+
+
+/* Additional styling for checkboxes */
+.checkbox-group {
+    display: flex;
+    flex-direction: column; /* Stack checkbox inputs vertically */
+}
+
+.parent-container {
+    align-items: end;
+    text-align: end;
+}

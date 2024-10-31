@@ -46,11 +46,12 @@ const LoanSchema = new mongoose.Schema({
     },
     paymentStatus: {
         type: String,
-        enum: ['Paid', 'Overdue', 'Delinquent'],
+        enum: ['Paid', 'Overdue', 'Not Paid'],
         required: true
     },
     defaultStatus: {
-        type: Boolean, // True if the loan is in default
+        type: String,
+        enum: ['Approved', 'Pending', 'Review'],
         required: true
     },
     riskRating: {

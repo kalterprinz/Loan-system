@@ -10,7 +10,7 @@ const Footer = () => {
             <div className="footer-container">
                 <div className="footer-logo">
                     <h3>MSU-IIT NMPC</h3>
-                    <img src="nmpc_logo1.jpg" alt="MSU-IIT NMPC Logo" className="logo1"/>
+                    <img src="nmpc_logo1.jpg" alt="MSU-IIT NMPC Logo" className="logofooter"/>
                 </div>
                 <div className="footer-links">
                     <div className="useful-links">
