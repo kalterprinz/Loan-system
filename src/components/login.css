@@ -72,11 +72,20 @@ button{
     font-size: 13px;
 }
 
-form {
+.login-box form {
     text-align: center; 
 }
 
 label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+    font-size: 12px;
+    text-align: left; 
+    margin-left: 35px;
+}
+
+.remember-me label{
     display: block;
     margin-bottom: 5px;
     font-weight: bold;
@@ -90,7 +99,7 @@ label {
 .remember-me {
     display: flex;
     align-items: center;
-    margin-left:20px;
+    margin-left:650px;
     margin-right: -20px;
 }
 

@@ -1,6 +1,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
+const multer = require('multer');
 const UserModel = require('./user');
 const LoanModel = require('./loan');
 var cors = require ('cors')
@@ -10,6 +11,15 @@ const port = 3001;
 app.use(cors())
 
 app.use(express.json())
+
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, 'uploads/');  // Ensure this folder exists
+    },
+    filename: (req, file, cb) => {
+        cb(null, Date.now() + path.extname(file.originalname));
+    }
+});
 
 mongoose.connect('mongodb://127.0.0.1/loan',{
     useNewUrlParser: true,
@@ -71,19 +81,59 @@ app.post('/signup', async (req, res) => {
 
 app.post('/loan', async (req, res) => {
     const {
-        loanId, applicantName, loanType, loanAmount, interestRate, loanTerm,
+        loanId, applicantName, newRe, emailAddress, permanentAddress, presentAddress, telMob, sex, age,
+        branch, civilStatus, spouseName, spouseOccu, location, loanType, loanAmount,
+        interestRate, loanTerm, purposeLoan, employer, empCon, empStatus, businessName,
+        businessAdd, lengthMem, shareCapital, savingsDepo, otherDepo, collateral,
+        collateralOther, sourcePay, sourcePayOther, modePay, mannerPay,
         repaymentSchedule, disbursementDate, currentBalance, paymentDueDate,
         paymentStatus, defaultStatus, riskRating, applicationDate, approvalDate, notes
     } = req.body;
+
+    // Validation for conditional fields
+    if (collateral === 'Others' && !collateralOther) {
+        return res.status(400).json({ error: "Please provide a custom value for 'collateral'." });
+    }
+    if (sourcePay === 'Others' && !sourcePayOther) {
+        return res.status(400).json({ error: "Please provide a custom value for 'sourcePay'." });
+    }
 
     try {
         const newLoan = new LoanModel({
             loanId,
             applicantName,
+            newRe,
+            emailAddress,
+            permanentAddress,
+            presentAddress,
+            telMob,
+            sex,
+            age,
+            branch,
+            civilStatus,
+            spouseName,
+            spouseOccu,
+            location,
             loanType,
             loanAmount,
             interestRate,
             loanTerm,
+            purposeLoan,
+            employer,
+            empCon,
+            empStatus,
+            businessName,
+            businessAdd,
+            lengthMem,
+            shareCapital,
+            savingsDepo,
+            otherDepo,
+            collateral,
+            collateralOther,
+            sourcePay,
+            sourcePayOther,
+            modePay,
+            mannerPay,
             repaymentSchedule,
             disbursementDate,
             currentBalance,
@@ -96,11 +146,11 @@ app.post('/loan', async (req, res) => {
             notes
         });
 
-        const loan = await newLoan.save();
-        res.status(201).json(loan);
-    } catch (err) {
-        console.error('Error creating loan:', err);
-        res.status(500).json({ error: 'Failed to create loan' });
+        await newLoan.save();
+        res.status(201).json(newLoan);
+    } catch (error) {
+        console.error('Error saving loan:', error);
+        res.status(500).json({ error: 'Failed to save loan' });
     }
 });
 

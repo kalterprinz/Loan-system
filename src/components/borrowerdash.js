@@ -1,5 +1,6 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+
+import React, { useEffect, useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import './borrowerdash.css'; 
 import LoanStatus from './loanstatus';
 import TransactionHistory from './transac';
@@ -8,6 +9,17 @@ import Footer from './footer';
 
 const Borrowerdash = () => {
 
+    const [loggedIn, setLoggedIn] = useState(true);
+    const navigate = useNavigate(); // For navigation after logout
+
+    const handleLogout = () => {
+        // Remove token and other user info from localStorage
+        localStorage.removeItem('token');
+        localStorage.removeItem('userId');
+        localStorage.removeItem('role');
+        setLoggedIn(false); // Update loggedIn state to false
+        navigate('/login'); // Redirect to home page after logout
+    };
     return (
         <div className="dashboardb">
            <BorrowerHeader /> 
@@ -43,6 +55,12 @@ const Borrowerdash = () => {
                             <p><i className="fas fa-phone" style={{ marginRight: '8px' }}></i>
                                 33757005467
                             </p> <hr />
+                            <div className="Log" onClick={handleLogout}>
+                    
+                    <div className="logoutcont">
+                        <p>Logout </p>
+                    </div>
+                </div>
                         </div>
                     </div>
                 </aside>
