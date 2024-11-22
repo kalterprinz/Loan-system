@@ -2,6 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 const multer = require('multer');
+const { v4: uuidv4 } = require('uuid');
 const UserModel = require('./user');
 const LoanModel = require('./loan');
 var cors = require ('cors')
@@ -80,43 +81,39 @@ app.post('/signup', async (req, res) => {
 });
 
 app.post('/loan', async (req, res) => {
-    const {
-        loanId, applicantName, newRe, emailAddress, permanentAddress, presentAddress, telMob, sex, age,
-        branch, civilStatus, spouseName, spouseOccu, location, loanType, loanAmount,
-        interestRate, loanTerm, purposeLoan, employer, empCon, empStatus, businessName,
-        businessAdd, lengthMem, shareCapital, savingsDepo, otherDepo, collateral,
-        collateralOther, sourcePay, sourcePayOther, modePay, mannerPay,
-        repaymentSchedule, disbursementDate, currentBalance, paymentDueDate,
-        paymentStatus, defaultStatus, riskRating, applicationDate, approvalDate, notes
+    const { 
+        branch, applicationDate, newRe, applicantName, emailAddress,
+        permanentAddress, presentAddress, telMob, age, sex, civilStatus, 
+        spouseName, spouseOccu, location, loanType, loanAmount, loanTerm, 
+        purposeLoan, employer, empCon, empStatus, businessName, businessAdd, 
+        lengthMem, shareCapital, savingsDepo, otherDepo ,collateral, sourcePay,
+        modePay, mannerPay
     } = req.body;
 
-    // Validation for conditional fields
-    if (collateral === 'Others' && !collateralOther) {
-        return res.status(400).json({ error: "Please provide a custom value for 'collateral'." });
-    }
-    if (sourcePay === 'Others' && !sourcePayOther) {
-        return res.status(400).json({ error: "Please provide a custom value for 'sourcePay'." });
-    }
-
     try {
+        // Validate required fields
+        if (!branch || !applicationDate || !newRe || !applicantName) {
+            return res.status(400).json({ error: 'Branch, application date, application type, and applicant name are required.' });
+        }
+
+        // Create a new Loan object
         const newLoan = new LoanModel({
-            loanId,
-            applicantName,
+            branch,
+            applicationDate,
             newRe,
+            applicantName,
             emailAddress,
             permanentAddress,
             presentAddress,
             telMob,
-            sex,
             age,
-            branch,
+            sex,
             civilStatus,
             spouseName,
             spouseOccu,
             location,
             loanType,
             loanAmount,
-            interestRate,
             loanTerm,
             purposeLoan,
             employer,
@@ -129,28 +126,24 @@ app.post('/loan', async (req, res) => {
             savingsDepo,
             otherDepo,
             collateral,
-            collateralOther,
             sourcePay,
-            sourcePayOther,
             modePay,
             mannerPay,
-            repaymentSchedule,
-            disbursementDate,
-            currentBalance,
-            paymentDueDate,
-            paymentStatus,
-            defaultStatus,
-            riskRating,
-            applicationDate,
-            approvalDate,
-            notes
         });
 
+        // Save the newLoan object to the database
         await newLoan.save();
-        res.status(201).json(newLoan);
+        return res.status(201).json({ 
+            message: 'Loan added successfully!',
+            loan: newLoan
+        });
+
     } catch (error) {
-        console.error('Error saving loan:', error);
-        res.status(500).json({ error: 'Failed to save loan' });
+        console.error('Error submitting loan:', error);
+        return res.status(500).json({ 
+            error: 'An error occurred while processing your request.',
+            details: error.message // Include error message details for debugging
+        });
     }
 });
 
