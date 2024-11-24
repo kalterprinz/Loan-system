@@ -67,6 +67,28 @@ const Appform = () => {
     const [sourcePayText, setSourcePayText] = useState("");
     const [modePay, setModePay] = useState("");
     const [mannerPay, setMannerPay] = useState("");
+    const [memberSig, setMemberSig] = useState(null);
+    const [spouseSig, setSpouseSig] = useState(null);
+    const [interestRate] = useState("0");
+    const [disbursementDate] = useState(() => {
+        const now = new Date();
+        return now.toISOString().split("T")[0];
+      });
+    const [paymentStatus] = useState("paid");
+    const [defaultStatus] = useState("pending");
+    const [riskRating] = useState("low");
+    const [approvalDate] = useState(() => {
+        const now = new Date();
+        return now.toISOString().split("T")[0];
+      });
+    const [notes] = useState("notes");
+    
+    const handleFileChange = (e, setFile) => {
+        const file = e.target.files[0];
+        if (file) {
+            setFile(file);
+        }
+    };
 
     const handleCollateralChange = (value) => {
         setCollateral(value);
@@ -84,78 +106,91 @@ const Appform = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
     
+        // Validate the "Others" fields for collateral and sourcePay
         let selectedCollateral = collateral;
-
         if (collateral === 'others') {
-            if (!collateralText.trim()) { // Check if the "Others" textarea is empty
+            if (!collateralText.trim()) {
                 alert('Please specify the collateral for "Others".');
                 return;
             }
-            selectedCollateral = collateralText.trim(); // Use the state value of the textarea
+            selectedCollateral = collateralText.trim();
         }
-
+    
         let selectedSourcePay = sourcePay;
-
         if (sourcePay === 'others') {
-            if (!sourcePayText.trim()) { // Check if the "Others" textarea is empty
+            if (!sourcePayText.trim()) {
                 alert('Please specify the Source of Payment for "Others".');
                 return;
             }
             selectedSourcePay = sourcePayText.trim();
         }
-
-        if (!branch || !applicationDate || !newRe) {
-            // Create a custom error message that includes the values
-            const missingFields = [];
     
+        // Validate required fields
+        if (!branch || !applicationDate || !newRe) {
+            const missingFields = [];
             if (!branch) missingFields.push("Branch");
             if (!applicationDate) missingFields.push("Application Date");
             if (!newRe) missingFields.push("Application Type");
-    
-            // Join the missing fields into a string and display them in the alert
             alert(`All fields are required! Missing: ${missingFields.join(', ')}`);
             return;
         }
     
-        const requestData = { branch, 
-            applicationDate, 
-            newRe,
-            applicantName,
-            emailAddress,
-            permanentAddress,
-            presentAddress,
-            telMob,
-            age,
-            sex,
-            civilStatus,
-            spouseName,
-            spouseOccu,
-            location: locationString, // You can directly send locationString or modify it
-            loanType,
-            loanAmount,
-            loanTerm,
-            purposeLoan,
-            employer,
-            empCon,
-            empStatus,
-            businessName,
-            businessAdd,
-            lengthMem,
-            shareCapital,
-            savingsDepo,
-            otherDepo,
-            collateral: selectedCollateral,
-            sourcePay: selectedSourcePay,
-            modePay,
-            mannerPay, };
-        console.log('Submitting data:', requestData); // Log for debugging
+        // Prepare FormData object
+        const formData = new FormData();
+        formData.append('branch', branch);
+        formData.append('applicationDate', applicationDate);
+        formData.append('newRe', newRe);
+        formData.append('applicantName', applicantName);
+        formData.append('emailAddress', emailAddress);
+        formData.append('permanentAddress', permanentAddress);
+        formData.append('presentAddress', presentAddress);
+        formData.append('telMob', telMob);
+        formData.append('age', age);
+        formData.append('sex', sex);
+        formData.append('civilStatus', civilStatus);
+        formData.append('spouseName', spouseName);
+        formData.append('spouseOccu', spouseOccu);
+        formData.append('location', locationString); // Modify if needed
+        formData.append('loanType', loanType);
+        formData.append('loanAmount', loanAmount);
+        formData.append('loanTerm', loanTerm);
+        formData.append('purposeLoan', purposeLoan);
+        formData.append('employer', employer);
+        formData.append('empCon', empCon);
+        formData.append('empStatus', empStatus);
+        formData.append('businessName', businessName);
+        formData.append('businessAdd', businessAdd);
+        formData.append('lengthMem', lengthMem);
+        formData.append('shareCapital', shareCapital);
+        formData.append('savingsDepo', savingsDepo);
+        formData.append('otherDepo', otherDepo);
+        formData.append('collateral', selectedCollateral);
+        formData.append('sourcePay', selectedSourcePay);
+        formData.append('modePay', modePay);
+        formData.append('mannerPay', mannerPay);
+        formData.append('interestRate', interestRate);
+        formData.append('disbursementDate', disbursementDate);
+        formData.append('paymentStatus', paymentStatus);
+        formData.append('defaultStatus', defaultStatus);
+        formData.append('riskRating', riskRating);
+        formData.append('approvalDate', approvalDate);
+        formData.append('notes', notes);
+    
+        // Append images if provided
+        if (memberSig) formData.append('memberSig', memberSig);
+        if (spouseSig) formData.append('spouseSig', spouseSig);
+    
+        console.log('Submitting data:', formData); // Log for debugging
     
         try {
-            const response = await axios.post('http://localhost:3001/loan', requestData);
+            const response = await axios.post('http://localhost:3001/loan', formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+            });
     
             if (response.status === 201) {
-                alert(response.data.message);
-                navigate('/cashflow');
+                navigate('/cashflow'); // Adjust navigation path if needed
             } else {
                 alert('Something went wrong.');
             }
@@ -164,6 +199,7 @@ const Appform = () => {
             alert(error.response?.data?.error || 'Error submitting loan. Please check your input.');
         }
     };
+    
 
     const handleLocationSelect = (selectedLocation) => {
         setLocation(selectedLocation); // Store selected location
@@ -355,7 +391,6 @@ const Appform = () => {
                                     name="spouseName" 
                                     value={spouseName} // Access from state
                                     onChange={(e) => setSpouseName(e.target.value)} // Update state
-                                    required 
                                 />
                             </div>
 
@@ -367,7 +402,6 @@ const Appform = () => {
                                     name="spouseOccu" 
                                     value={spouseOccu} // Access from state
                                     onChange={(e) => setSpouseOccu(e.target.value)} // Update state
-                                    required 
                                 />
                             </div>
 
@@ -490,7 +524,6 @@ const Appform = () => {
                                     name="employer" 
                                     value={employer} // Access from state
                                     onChange={(e) => setEmployer(e.target.value)} // Update state
-                                    required 
                                 />
                             </div>
 
@@ -502,7 +535,6 @@ const Appform = () => {
                                     name="empCon" 
                                     value={empCon} // Access from state
                                     onChange={(e) => setEmpCon(e.target.value)} // Update state
-                                    required 
                                 />
                             </div>
 
@@ -514,7 +546,6 @@ const Appform = () => {
                                     name="empStatus" 
                                     value={empStatus} // Access from state
                                     onChange={(e) => setEmpStatus(e.target.value)} // Update state
-                                    required 
                                 />
                             </div>
 
@@ -526,7 +557,6 @@ const Appform = () => {
                                     name="businessName" 
                                     value={businessName} // Access from state
                                     onChange={(e) => setBusinessName(e.target.value)} // Update state
-                                    required 
                                 />
                             </div>
 
@@ -538,7 +568,6 @@ const Appform = () => {
                                     name="businessAdd" 
                                     value={businessAdd} // Access from state
                                     onChange={(e) => setBusinessAdd(e.target.value)} // Update state
-                                    required 
                                 />
                             </div>
 
@@ -582,7 +611,6 @@ const Appform = () => {
                                     name="otherDepo" 
                                     value={otherDepo} // Access from state
                                     onChange={(e) => setOtherDepo(e.target.value)} // Update state
-                                    required 
                                 />
                             </div>
                         </div>
@@ -887,6 +915,8 @@ const Appform = () => {
                                     type="file"
                                     id="borrower-signature"
                                     name="memberSig"
+                                    onChange={(e) => handleFileChange(e, setMemberSig)}
+                                    required
                                 />
                             </div>
                         </div>
@@ -898,6 +928,7 @@ const Appform = () => {
                                     type="file"
                                     id="spouse-signature"
                                     name="spouseSig"
+                                    onChange={(e) => handleFileChange(e, setSpouseSig)}
                                 />
                             </div>
                         </div>

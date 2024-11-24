@@ -2,7 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 const multer = require('multer');
-const { v4: uuidv4 } = require('uuid');
+const bodyParser = require('body-parser');
 const UserModel = require('./user');
 const LoanModel = require('./loan');
 var cors = require ('cors')
@@ -12,15 +12,7 @@ const port = 3001;
 app.use(cors())
 
 app.use(express.json())
-
-const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-        cb(null, 'uploads/');  // Ensure this folder exists
-    },
-    filename: (req, file, cb) => {
-        cb(null, Date.now() + path.extname(file.originalname));
-    }
-});
+app.use(bodyParser.json());
 
 mongoose.connect('mongodb://127.0.0.1/loan',{
     useNewUrlParser: true,
@@ -80,21 +72,32 @@ app.post('/signup', async (req, res) => {
     }
 });
 
-app.post('/loan', async (req, res) => {
+const storage = multer.memoryStorage();
+const upload = multer({ storage });
+
+// POST endpoint for creating loans with embedded images
+app.post('/loan', upload.fields([{ name: 'memberSig' }, { name: 'spouseSig' }]), async (req, res) => {
     const { 
         branch, applicationDate, newRe, applicantName, emailAddress,
         permanentAddress, presentAddress, telMob, age, sex, civilStatus, 
         spouseName, spouseOccu, location, loanType, loanAmount, loanTerm, 
         purposeLoan, employer, empCon, empStatus, businessName, businessAdd, 
         lengthMem, shareCapital, savingsDepo, otherDepo ,collateral, sourcePay,
-        modePay, mannerPay
+        modePay, mannerPay, interestRate, disbursementDate, paymentStatus,
+        defaultStatus, riskRating, approvalDate, notes,
     } = req.body;
 
     try {
+        const { files } = req;
+
         // Validate required fields
         if (!branch || !applicationDate || !newRe || !applicantName) {
             return res.status(400).json({ error: 'Branch, application date, application type, and applicant name are required.' });
         }
+
+        // Prepare image data if provided
+        const memberSig = files.memberSig ? files.memberSig[0] : null;
+        const spouseSig = files.spouseSig ? files.spouseSig[0] : null;
 
         // Create a new Loan object
         const newLoan = new LoanModel({
@@ -129,12 +132,30 @@ app.post('/loan', async (req, res) => {
             sourcePay,
             modePay,
             mannerPay,
+            interestRate,
+            disbursementDate,
+            paymentStatus,
+            defaultStatus,
+            riskRating,
+            approvalDate,
+            notes,
+            memberSig: memberSig
+                ? {
+                      data: memberSig.buffer,
+                      contentType: memberSig.mimetype,
+                  }
+                : undefined,
+            spouseSig: spouseSig
+                ? {
+                      data: spouseSig.buffer,
+                      contentType: spouseSig.mimetype,
+                  }
+                : undefined,
         });
 
         // Save the newLoan object to the database
         await newLoan.save();
         return res.status(201).json({ 
-            message: 'Loan added successfully!',
             loan: newLoan
         });
 
@@ -146,6 +167,42 @@ app.post('/loan', async (req, res) => {
         });
     }
 });
+
+
+app.get('/pics/:imageId', async (req, res) => {
+    try {
+        const { imageId } = req.params; // Get image ID from the route parameter
+        const { imageType } = req.query; // Get image type from the query parameter
+
+        // Fetch the document from MongoDB using the imageId
+        const document = await ImageModel.findById(imageId);
+
+        if (!document) {
+            return res.status(404).send('Image not found');
+        }
+
+        // Determine which image to send
+        let image;
+        if (imageType === 'spouseSig') {
+            image = document.spouseSig;
+        } else {
+            image = document.memberSig; // Default to memberSig
+        }
+
+        // Check if the selected image exists
+        if (!image || !image.data) {
+            return res.status(404).send('Selected image not found');
+        }
+
+        // Set response content type and send the image data
+        res.contentType(image.contentType);
+        res.send(image.data);
+    } catch (error) {
+        console.error('Error fetching image:', error);
+        res.status(500).send('Internal server error');
+    }
+});
+
 
 app.put('/loan/:loanId', async (req, res) => {
     const loanId = req.params.loanId;

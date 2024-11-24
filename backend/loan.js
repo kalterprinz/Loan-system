@@ -124,6 +124,45 @@ const LoanSchema = new mongoose.Schema({
         enum:['otc','collector','payroll','pdc','auto-debit'],
         required: true
     },
+    memberSig: {
+        data: { type: Buffer, required: true }, // The buffer is required
+        contentType: { type: String, required: true }, // The contentType is required
+    },
+    spouseSig: {
+        data: { type: Buffer }, // Optional buffer
+        contentType: { type: String }, // Optional contentType
+    },
+    interestRate:{
+        type:Number,
+        required: true
+    },
+    disbursementDate:{
+        type:Date,
+        required: true
+    },
+    paymentStatus:{
+        type:String,
+        enum:['overdue','paid'],
+        required: true
+    },
+    defaultStatus:{
+        type:String,
+        enum:['pending','review','approved'],
+        required: true
+    },
+    riskRating:{
+        type:String,
+        enum:['low','medium','high'],
+        required: true
+    },
+    approvalDate:{
+        type:Date,
+        required: true
+    },
+    notes:{
+        type:String,
+        required: true
+    },
 });
 
 const LoanModel = mongoose.model('Loan', LoanSchema);
