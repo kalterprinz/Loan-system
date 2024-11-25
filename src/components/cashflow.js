@@ -1,8 +1,19 @@
 import React,  { useState } from 'react';
+import axios from 'axios';
+import { useNavigate,  useSearchParams } from 'react-router-dom';
 import './cashflow.css'; // This file will contain the necessary CSS
 import Footer from './footer';
 
 const CashFlow = () => {
+    const navigate = useNavigate();
+    const [searchParams] = useSearchParams();
+    const loanId = searchParams.get('loanId');
+
+    if (!loanId) {
+        console.error('No loanId found in the URL.');
+        return <div>Error: No associated loan found. Please navigate with a valid loan ID.</div>;
+    }
+
     const [income, setIncome] = useState({
         salaries: "",
         spouseIncome: "",
@@ -46,6 +57,54 @@ const CashFlow = () => {
     const totalExpenditureAndCashOutlays = totalExpenditures + totalCashOutlays;
     const netSavings = totalIncome - totalExpenditureAndCashOutlays;
 
+    const [otherOutlays, setOtherOutlays] = useState("");
+    const [memberBorSig, setMemberBorSig] = useState(null);
+    const [comaker, setComaker] = useState("");
+    const [cfaplidate, setCfaplidate] = useState("");
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+
+        const formData = new FormData();
+        formData.append('loanId', loanId);
+        formData.append('totalIncome', totalIncome);
+        formData.append('totalExpenditures', totalExpenditures);
+        formData.append('totalCashOutlays', totalCashOutlays);
+        formData.append('totalExpenditureAndCashOutlays', totalExpenditureAndCashOutlays);
+        formData.append('netSavings', netSavings);
+        formData.append('otherOutlays', otherOutlays);
+        formData.append('comaker', comaker);
+        formData.append('cfaplidate', cfaplidate);
+
+        if (memberBorSig) formData.append('memberBorSig', memberBorSig);
+
+        console.log('Submitting data:', formData);
+
+        try {
+            const response = await axios.post('http://localhost:3001/cashflow', formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+            });
+
+            if (response.status === 201) {
+                navigate(`/`); 
+            } else {
+                alert('Something went wrong.');
+            }
+        } catch (error) {
+            console.error('Error submitting loan:', error.response?.data || error.message);
+            alert(error.response?.data?.error || 'Error submitting loan. Please check your input.');
+        }
+    }
+
+    const handleFileChange = (e, setFile) => {
+        const file = e.target.files[0];
+        if (file) {
+            setFile(file);
+        }
+    };
+
     return (
         <div className="cashapplication">
             {/* Header Section */}
@@ -58,7 +117,7 @@ const CashFlow = () => {
             {/* Form Container */}
             <div className="sulodPormcas">
                 <h3 className="title">Cash Flow Statement</h3>
-                <form className="cashflow">
+                <form className="cashflow" onSubmit={handleSubmit}>
                     <div className="section">
                         <h3>Income</h3>
                         <div className="item">
@@ -296,16 +355,7 @@ const CashFlow = () => {
                                                 placeholder="₱"
                                             />
                                         </div>
-                                        <div className="item">
-                                            <label>Others:</label>
-                                            <input type="text" placeholder="Specify details here..." style={{ marginBottom: "4px", width: "10%", marginRight: "178px" }} />
-                                            <input
-                                                type="number"
-                                                value={cashOutlays.otherCashOutlay}
-                                                onChange={(e) => setCashOutlays({ ...cashOutlays, otherCashOutlay: e.target.value })}
-                                                placeholder="₱"
-                                            />
-                                        </div>
+                                        
                                     </div>
                                     <div className="item">
                                         <label>Payments of Insurance or Pension Premiums:</label>
@@ -318,7 +368,13 @@ const CashFlow = () => {
                                     </div>
                                     <div className="item">
                                         <label>Other Cash Outlays:</label>
-                                        <input type="text" placeholder="Specify details here..." style={{ marginBottom: "4px", width: "50%", marginRight: "200px" }} />
+                                        <input type="text" 
+                                        placeholder="Specify details here..." 
+                                        style={{ marginBottom: "4px", width: "50%", marginRight: "200px" }} 
+                                        value={otherOutlays}
+                                        onChange={(e) => setOtherOutlays(e.target.value)}
+                                        />
+                                        
                                         <input
                                             type="number"
                                             value={cashOutlays.otherCashOutlay}
@@ -350,21 +406,39 @@ const CashFlow = () => {
                                 <div className="ubos">
                                     <div className="tulo">
                                         <label htmlFor="borrower-signature">Member-Borrower’s Signature</label>
-                                        <input type="file" id="borrower-signature" name="borrowerSignature" required />
+                                        <input 
+                                            type="file" 
+                                            id="borrower-signature" 
+                                            name="borrowerSignature" 
+                                            onChange={(e) => handleFileChange(e, setMemberBorSig)}
+                                            required />
                                     </div>
                                 </div>
 
                                 <div className="ubos">
                                     <div className="very">
-                                        <label htmlFor="spouse-signature">Verified by</label>
-                                        <input type="text" id="verified" name="verified" placeholder="Co-maker's name" />
+                                        <label htmlFor="comaker">Verified by</label>
+                                        <input 
+                                            type="text" 
+                                            id="verified" 
+                                            name="verified" 
+                                            placeholder="Co-maker's name" 
+                                            value={comaker} // Access from state
+                                            onChange={(e) => setComaker(e.target.value)} // Update state
+                                            required/>
                                     </div>
                                 </div>
 
                                 <div className="ubos">
                                     <div className="tulo">
                                         <label htmlFor="date">Date</label>
-                                        <input type="date" id="date" name="date" required />
+                                        <input 
+                                            type="date" 
+                                            id="date" 
+                                            name="date" 
+                                            value={cfaplidate} 
+                                            onChange={(e) => setCfaplidate(e.target.value)} 
+                                            required />
                                     </div>
                                 </div>
 

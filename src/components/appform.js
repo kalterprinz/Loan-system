@@ -190,7 +190,8 @@ const Appform = () => {
             });
     
             if (response.status === 201) {
-                navigate('/cashflow'); // Adjust navigation path if needed
+                const { _id } = response.data;
+                navigate(`/cashflow?loanId=${_id}`); // Adjust navigation path if needed
             } else {
                 alert('Something went wrong.');
             }

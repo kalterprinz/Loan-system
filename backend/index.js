@@ -5,6 +5,7 @@ const multer = require('multer');
 const bodyParser = require('body-parser');
 const UserModel = require('./user');
 const LoanModel = require('./loan');
+const Cashflow = require('./cashflow');
 var cors = require ('cors')
 
 const app = express();
@@ -156,7 +157,7 @@ app.post('/loan', upload.fields([{ name: 'memberSig' }, { name: 'spouseSig' }]),
         // Save the newLoan object to the database
         await newLoan.save();
         return res.status(201).json({ 
-            loan: newLoan
+            _id: newLoan._id 
         });
 
     } catch (error) {
@@ -168,6 +169,71 @@ app.post('/loan', upload.fields([{ name: 'memberSig' }, { name: 'spouseSig' }]),
     }
 });
 
+app.post('/cashflow', upload.fields([{ name: 'memberBorSig' }]), async (req, res) => {
+    const {
+        loanId,
+        totalIncome,
+        totalExpenditures,
+        totalCashOutlays,
+        totalExpenditureAndCashOutlays,
+        netSavings,
+        otherOutlays,
+        comaker,
+        cfaplidate,
+    } = req.body;
+    
+    try {
+        const { files } = req;
+        
+        if (!loanId) {
+            return res.status(400).json({ error: 'loanId is required to associate the cashflow with a loan.' });
+        }
+
+        // Validate required fields
+        if (!totalIncome || !totalExpenditures || !totalCashOutlays || !totalExpenditureAndCashOutlays || !netSavings) {
+            return res.status(400).json({ error: 'Required fields are missing.' });
+        }
+
+        const memberBorSig = files.memberBorSig ? files.memberBorSig[0] : null;
+
+        const loanExists = await LoanModel.findById(loanId);
+        if (!loanExists) {
+            return res.status(404).json({ error: 'Loan with the provided ID does not exist.' });
+        }
+
+        // Prepare the cashflow object
+        const newCashflow = new Cashflow({
+            loanId,
+            totalIncome: Number(totalIncome),
+            totalExpenditures: Number(totalExpenditures),
+            totalCashOutlays: Number(totalCashOutlays),
+            totalExpenditureAndCashOutlays: Number(totalExpenditureAndCashOutlays),
+            netSavings: Number(netSavings),
+            otherOutlays,
+            comaker,
+            cfaplidate: cfaplidate ? new Date(cfaplidate) : undefined,
+            memberBorSig: memberBorSig
+                ? {
+                      data: memberBorSig.buffer,
+                      contentType: memberBorSig.mimetype,
+                  }
+                : undefined,
+        });
+
+        await newCashflow.save();
+
+        return res.status(201).json({
+            cashflow: newCashflow,
+        });
+    
+    } catch (error) {
+        console.error('Error submitting loan:', error);
+        return res.status(500).json({ 
+            error: 'An error occurred while processing your request.',
+            details: error.message // Include error message details for debugging
+        });
+    }
+});
 
 app.get('/pics/:imageId', async (req, res) => {
     try {
