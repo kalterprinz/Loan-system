@@ -6,6 +6,7 @@ const bodyParser = require('body-parser');
 const UserModel = require('./user');
 const LoanModel = require('./loan');
 const Cashflow = require('./cashflow');
+const ComakerModel = require('./comaker');
 var cors = require ('cors')
 
 const app = express();
@@ -226,6 +227,93 @@ app.post('/cashflow', upload.fields([{ name: 'memberBorSig' }]), async (req, res
 
         return res.status(201).json({
             cashflow: newCashflow,
+        });
+    
+    } catch (error) {
+        console.error('Error submitting loan:', error);
+        return res.status(500).json({ 
+            error: 'An error occurred while processing your request.',
+            details: error.message // Include error message details for debugging
+        });
+    }
+});
+
+app.post('/comaker', upload.fields([{ name: 'memberSig' }]), async (req, res) => {
+    const {
+        branch,
+        applicationDate,
+        comakerName,
+        emailAddress,
+        permanentAddress,
+        presentAddress,
+        telMob,
+        age,
+        sex,
+        civilStatus,
+        spouseName,
+        residentStatus,
+        amortization,
+        employer,
+        businessAdd,
+        empStatus,
+        lengthService,
+        annualSalary,
+        firm,
+        businessAdd2,
+        natureBus,
+        soleOwner,
+        capitalInvest,
+        outstandingObligations,
+        properties,
+        relationship,
+        yearsKnown,
+    } = req.body;
+    
+    try {
+        const { files } = req;
+
+        const memberSig = files.memberSig ? files.memberSig[0] : null;
+
+        const newComaker = new ComakerModel({
+            branch,
+            applicationDate,
+            comakerName,
+            emailAddress,
+            permanentAddress,
+            presentAddress,
+            telMob,
+            age,
+            sex,
+            civilStatus,
+            spouseName,
+            residentStatus,
+            amortization,
+            employer,
+            businessAdd,
+            empStatus,
+            lengthService,
+            annualSalary,
+            firm,
+            businessAdd2,
+            natureBus,
+            soleOwner,
+            capitalInvest,
+            outstandingObligations,
+            properties,
+            relationship,
+            yearsKnown,
+            memberSig: memberSig
+                ? {
+                      data: memberSig.buffer,
+                      contentType: memberSig.mimetype,
+                  }
+                : undefined,
+        });
+
+        await newComaker.save();
+
+        return res.status(201).json({
+            comaker: newComaker,
         });
     
     } catch (error) {
