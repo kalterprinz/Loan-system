@@ -40,11 +40,11 @@ const CashFlow = () => {
     });
 
     const [cashOutlays, setCashOutlays] = useState({
-        debts: "", 
         productiveLoan: "",
         housingAmortization: "",
         vehicleAmortization: "",
         appliancesAmortization: "",
+        otherDebts:"",
         insurance: "",
         otherCashOutlay: "",
     });
@@ -57,6 +57,7 @@ const CashFlow = () => {
     const totalExpenditureAndCashOutlays = totalExpenditures + totalCashOutlays;
     const netSavings = totalIncome - totalExpenditureAndCashOutlays;
 
+    const [otherDebts, setOtherDebts] = useState("");
     const [otherOutlays, setOtherOutlays] = useState("");
     const [memberBorSig, setMemberBorSig] = useState(null);
     const [comaker, setComaker] = useState("");
@@ -72,6 +73,7 @@ const CashFlow = () => {
         formData.append('totalCashOutlays', totalCashOutlays);
         formData.append('totalExpenditureAndCashOutlays', totalExpenditureAndCashOutlays);
         formData.append('netSavings', netSavings);
+        formData.append('otherDebts', otherDebts);
         formData.append('otherOutlays', otherOutlays);
         formData.append('comaker', comaker);
         formData.append('cfaplidate', cfaplidate);
@@ -311,12 +313,6 @@ const CashFlow = () => {
                                     <h3>Cash Layout</h3>
                                     <div className="item">
                                         <label>Payment of other Debts/Amortization:</label>
-                                        <input
-                                            type="number"
-                                            value={cashOutlays.debts}
-                                            onChange={(e) => setCashOutlays({ ...cashOutlays, debts: e.target.value })}
-                                            placeholder="₱"
-                                        />
                                     </div>
                                     <div className="group">
                                         <div className="item">
@@ -355,7 +351,23 @@ const CashFlow = () => {
                                                 placeholder="₱"
                                             />
                                         </div>
-                                        
+                                        <div className="item">
+                                            <label>Others:</label>
+                                            <input 
+                                                type="text" 
+                                                placeholder="Specify details here..." 
+                                                style={{ marginBottom: "4px", width: "50%", marginRight: "200px" }} 
+                                                value={otherDebts}
+                                                onChange={(e) => setOtherDebts(e.target.value)}
+                                            />
+                                            
+                                            <input
+                                                type="number"
+                                                value={cashOutlays.otherDebts}
+                                                onChange={(e) => setCashOutlays({ ...cashOutlays, otherDebts: e.target.value })}
+                                                placeholder="₱"
+                                            />
+                                        </div>
                                     </div>
                                     <div className="item">
                                         <label>Payments of Insurance or Pension Premiums:</label>
