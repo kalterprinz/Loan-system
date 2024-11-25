@@ -12,6 +12,7 @@ const cashflowSchema = new mongoose.Schema({
     totalExpenditureAndCashOutlays: { type: Number, required: true },
     netSavings: { type: Number, required: true },
     otherOutlays: { type: String},
+    otherOutlays: { type: String},
     comaker: { type: String, default: '' },
     cfaplidate: { type: Date }, // Not required, optional field
     memberBorSig: {
