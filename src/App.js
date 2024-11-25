@@ -16,6 +16,7 @@ import OfficerProfile from './components/officerprof'; // Ensure correct file ca
 import OfficerDashboard1 from './components/officerdashboard1'; // Ensure correct file case
 import ApplicationForm from './components/appform'; // Ensure correct file case
 import CashFlow from './components/cashflow'; // Ensure `cashflow.js` exports correctly
+import CoMaker from './components/comaker';
 // import Sidebar from './components/Sidebar'; // Uncomment only if `Sidebar.js` is correct
 
 function App() {
@@ -34,6 +35,7 @@ function App() {
           <Route path="/borrowerdash" element={<Borrower />} />
           <Route path="/loanstatus" element={<LoanStatus />} />
           <Route path="/transac" element={<TransactionHistory />} />
+          <Route path="/comaker" element={<CoMaker />} />
           
           {/* Officer Dashboards */}
           <Route path="/officerdashboard1" element={<OfficerDashboard1 />} />
